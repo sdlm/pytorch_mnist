@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -14,6 +16,8 @@ epochs = 2  # how many epochs to train for
 
 loss_func = F.cross_entropy
 
+MODEL_PATH = 'model.pt'
+
 
 class Mnist_CNN(nn.Module):
     def __init__(self):
@@ -29,6 +33,10 @@ class Mnist_CNN(nn.Module):
         xb = F.relu(self.conv3(xb))
         xb = F.avg_pool2d(xb, 4)
         return xb.view(-1, xb.size(1))
+
+    def save(self, path):
+        torch.save(self.state_dict(), path)
+        print('model saved')
 
 
 def loss_batch(model, loss_func, xb, yb, opt=None):
@@ -57,6 +65,9 @@ def fit(epochs, model, loss_func, opt, train_dl, valid_dl):
 
         print(epoch, val_loss)
 
+        if (epoch + 1) % 2 == 0:
+            model.save(path=MODEL_PATH)
+
 
 def get_data(train_ds, valid_ds, bs):
     return (
@@ -78,7 +89,21 @@ if __name__ == '__main__':
     valid_ds = TensorDataset(x_valid, y_valid)
 
     train_dl, valid_dl = get_data(train_ds, valid_ds, bs)
+
     model = Mnist_CNN()
+    if os.path.isfile(MODEL_PATH):
+        model.load_state_dict(torch.load(MODEL_PATH))
+        model.eval()
+        print('model loaded')
+
+    if torch.cuda.is_available():
+        dev = torch.device('cuda')
+        print('use GPU !!')
+        print(f'device_count: {torch.cuda.device_count()}')
+        print(f'current_device: {torch.cuda.current_device()}')
+        print(f'get_device_name: {torch.cuda.get_device_name(0)}')
+        model.to(dev)
+
     opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
     fit(epochs, model, loss_func, opt, train_dl, valid_dl)
