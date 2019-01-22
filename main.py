@@ -77,7 +77,16 @@ def get_data(train_ds, valid_ds, bs):
 
 
 if __name__ == '__main__':
-    torch.set_num_threads(4)
+    use_cuda = torch.cuda.is_available()
+
+    if use_cuda:
+        dev = torch.device('cuda')
+        print('use GPU !!')
+        print(f'device_count: {torch.cuda.device_count()}')
+        print(f'current_device: {torch.cuda.current_device()}')
+        print(f'get_device_name: {torch.cuda.get_device_name(0)}')
+    else:
+        torch.set_num_threads(4)
 
     x_train, y_train, x_valid, y_valid = get_mnist_data()
 
@@ -96,13 +105,8 @@ if __name__ == '__main__':
         model.eval()
         print('model loaded')
 
-    if torch.cuda.is_available():
-        dev = torch.device('cuda')
-        print('use GPU !!')
-        print(f'device_count: {torch.cuda.device_count()}')
-        print(f'current_device: {torch.cuda.current_device()}')
-        print(f'get_device_name: {torch.cuda.get_device_name(0)}')
-        model.to(dev)
+    if use_cuda:
+        model = model.to(dev)
 
     opt = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
 
