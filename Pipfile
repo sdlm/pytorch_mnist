@@ -9,6 +9,16 @@ torchvision = "*"
 requests = "*"
 matplotlib = "*"
 jupyter = "*"
+six = "*"
+numpy = "*"
+scipy = "*"
+pillow = "*"
+scikit-image = "*"
+opencv-python = "*"
+imageio = "*"
+shapely = "*"
+imgaug = "*"
+pytesseract = "*"
 
 [dev-packages]
 
