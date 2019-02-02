@@ -19,6 +19,7 @@ imageio = "*"
 shapely = "*"
 imgaug = "*"
 pytesseract = "*"
+pandas = "*"
 
 [dev-packages]
 
